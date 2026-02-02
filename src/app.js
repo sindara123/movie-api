@@ -5,6 +5,7 @@ import morgan from "morgan";
 import helmet from "helmet";
 import usersRoute from "./routes/users.route.js";
 import authRoute from "./routes/auth.route.js";
+import homeRoute from "./routes/home.route.js";
 import errorHandler from "./middlewares/error.middleware.js";
 import appLimiter from "./middlewares/rateLimiter.js";
 const app = express();
@@ -26,6 +27,7 @@ app.use(helmet());
 app.use(express.json());
 
 //Routes
+app.use("/", homeRoute);
 app.use("/api/v1/users", usersRoute);
 app.use("/api/v1/auth", authRoute);
 app.use(errorHandler);
