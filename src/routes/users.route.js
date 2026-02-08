@@ -6,12 +6,8 @@ import User from "../models/user.model.js";
 const router = Router();
 
 router.get("/", async (req, res) => {
-  const user = await User.findOne({ email: "dara80@gmail.com" });
-  res.status(200).json({
-    id: user._id,
-    name: user.name,
-    email: user.email,
-  });
+  const users = await User.find().select("-password");
+  if (users) return res.status(200).json(users);
 });
 
 router.post("/register", validate, registerHandler);

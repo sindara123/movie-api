@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { Router } from "express";
+import { email, z } from "zod";
+import e, { Router } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
@@ -7,38 +7,50 @@ import User from "../models/user.model.js";
 const router = Router();
 
 router.post("/register", async (req, res) => {
-  const { name, password, email } = req.body;
-  const { error } = validate(req.body);
+  //verify credentials
+  //using zod
+  const { error } = validateDTO(req.body);
   if (error)
     return res.status(400).json({
-      message: "Validation Error!",
-      errors: error.issues,
+      message: "Validaton Failed.",
+      errors: error.issues.map((err) => err.message),
     });
+
+  const exist = await User.findOne({ email: req.body.email });
+  if (exist) return res.status(409).json({ message: "User exist!" });
+
+  //hash password
   const salt = await bcrypt.genSalt(10);
-  const hashPassword = await bcrypt.hash(password, salt);
+  const hashPassword = await bcrypt.hash(req.body.password, salt);
+  console.log(hashPassword);
+  //save user in db
 
   const user = await User.create({
-    name,
-    email,
+    name: req.body.name,
+    email: req.body.email,
     password: hashPassword,
   });
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 
+  //issue token
+
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
   res
-    .status(200)
     .header({ Authorization: `Bearer ${token}` })
+    .status(201)
     .json({
-      id: user._id,
+      message: "Registered successful.",
       name: user.name,
       email: user.email,
     });
+
+  //response user
 });
 
-const validate = (data) => {
+const validateDTO = (data) => {
   const schema = z.object({
-    name: z.string().min(5, "Name too short.").max(25),
-    email: z.email("Invalid email"),
-    password: z.string().min(5, "Password at least 5 characters.").max(1024),
+    name: z.string().min(5, "Name too short.").max(20),
+    email: z.email(),
+    password: z.string().min(8, "Password too short.").max(50),
   });
   return schema.safeParse(data);
 };
