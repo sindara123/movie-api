@@ -5,9 +5,12 @@ const dbConnect = debug("app:db");
 
 const connectDB = async () => {
   try {
-    const connectionInstance = await mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 5000,
-    });
+    const connectionInstance = await mongoose.connect(
+      process.env.MONGO_URI_DEV,
+      {
+        serverSelectionTimeoutMS: 5000,
+      },
+    );
     console.log(
       `MongoDB connected ${connectionInstance.connection.host} (${process.env.NODE_ENV || "development"})`,
     );
