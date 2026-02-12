@@ -18,7 +18,7 @@ app.set("trust proxy", 1);
 app.use(appLimiter);
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: "https://game-hub-phi-three.vercel.app",
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
