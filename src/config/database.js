@@ -6,7 +6,9 @@ const dbConnect = debug("app:db");
 const connectDB = async () => {
   try {
     const connectionInstance = await mongoose.connect(
-      process.env.MONGO_URI_DEV,
+      process.env.NODE_ENV !== "production"
+        ? process.env.MONGO_URI_DEV
+        : process.env.MONGO_URI,
       {
         serverSelectionTimeoutMS: 5000,
       },
